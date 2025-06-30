@@ -1334,5 +1334,5 @@ func getServerURL() string {
 	if url != "" {
 		return url
 	}
-	return "https://6607-70-50-65-123.ngrok-free.app"
+	return "https://vapi-customer-service.onrender.com"
 } 
