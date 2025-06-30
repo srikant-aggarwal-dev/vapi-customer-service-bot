@@ -1,0 +1,11 @@
+[build]
+builder = "dockerFile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 60
+restartPolicyType = "always"
+
+[environments.production]
+variables = { PORT = "8080" } 

@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  vapi-server:
+    build: .
+    container_name: vapi-customer-service-server
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+    volumes:
+      # Mount server directory for development (optional - comment out for production)
+      - ./server:/app/server
+    restart: unless-stopped
+    networks:
+      - vapi-network
+
+  # Optional: You can add the Next.js client here too
+  # vapi-client:
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #   container_name: vapi-client
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NODE_ENV=development
+  #   volumes:
+  #     - ./client:/app
+  #     - /app/node_modules
+  #   restart: unless-stopped
+  #   networks:
+  #     - vapi-network
+
+networks:
+  vapi-network:
+    driver: bridge
