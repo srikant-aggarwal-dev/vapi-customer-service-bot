@@ -173,7 +173,7 @@ func ExportClientsToExcel(clients []Client, filename string) error {
 // addSummarySheet adds a summary sheet with statistics
 func addSummarySheet(f *excelize.File, clients []Client) error {
 	summarySheet := "Summary"
-	index, err := f.NewSheet(summarySheet)
+	_, err := f.NewSheet(summarySheet)
 	if err != nil {
 		return err
 	}
