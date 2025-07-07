@@ -1,0 +1,9 @@
+{
+  "voice": {
+    "provider": "11labs",
+    "voiceId": "ErXwobaYiN019PkySvjV",
+    "speed": 0.9,
+    "stability": 0.8,
+    "similarityBoost": 0.8
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "voice": {
+    "provider": "cartesia",
+    "voiceId": "barbershop"
+  }
+}

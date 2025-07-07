@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -158,6 +159,83 @@ func runHTTPServer() {
 	// API endpoints for clients management
 	r.GET("/clients", func(c *gin.Context) {
 		c.JSON(http.StatusOK, clients)
+	})
+
+	// Excel export endpoint
+	r.GET("/export/excel", func(c *gin.Context) {
+		if len(clients) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "No leads available to export",
+			})
+			return
+		}
+
+		filename := GenerateExcelFilename()
+		if err := ExportClientsToExcel(clients, filename); err != nil {
+			log.Printf("❌ Failed to export to Excel: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to generate Excel file",
+			})
+			return
+		}
+
+		log.Printf("✅ Excel export created: %s", filename)
+		
+		// Send file as download
+		c.Header("Content-Description", "File Transfer")
+		c.Header("Content-Disposition", "attachment; filename="+filename)
+		c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+		c.File(filename)
+		
+		// Clean up the file after sending (optional)
+		// Note: You might want to keep the file for backup purposes
+		// os.Remove(filename)
+	})
+
+	// Excel export with custom filename
+	r.POST("/export/excel", func(c *gin.Context) {
+		var request struct {
+			Filename string `json:"filename"`
+		}
+		
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid request format",
+			})
+			return
+		}
+
+		if len(clients) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "No leads available to export",
+			})
+			return
+		}
+
+		filename := request.Filename
+		if filename == "" {
+			filename = GenerateExcelFilename()
+		}
+		
+		// Ensure .xlsx extension
+		if !strings.HasSuffix(filename, ".xlsx") {
+			filename += ".xlsx"
+		}
+
+		if err := ExportClientsToExcel(clients, filename); err != nil {
+			log.Printf("❌ Failed to export to Excel: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to generate Excel file",
+			})
+			return
+		}
+
+		log.Printf("✅ Excel export created: %s", filename)
+		c.JSON(http.StatusOK, gin.H{
+			"message":  "Excel file created successfully",
+			"filename": filename,
+			"leads":    len(clients),
+		})
 	})
 
 	// Add MCP HTTP bridge routes
